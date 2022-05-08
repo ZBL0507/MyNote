@@ -97,4 +97,46 @@ Using ```docker build``` users can create an automated build that executes sever
    ```
 
 
+## 自定义镜像 mycentosjava8
+1. 要求： centos 镜像具备 vim + ifconfig + jdk8
+2. 编写Dockerfile
+   ```dockerfile
+   FROM centos
+   MAINTAINER ZBL<ZBL@qq.com>
+
+   ENV MYPATH /usr/local
+   WORKDIR $MYPATH
+
+   #安装vim编译器
+   RUN yum -y install vim
+   #安装ifconfig命令查看网络ip
+   RUN yum -y install net-tools
+   #安装Java8以及lib库
+   RUN yum -y install glibc.i686
+   RUN mkdir /usr/local/java
+   #ADD是相对路径jar，把jdk-8u171-linux-x64.tar.gz添加到容器中，安装包必须要和Dockerfile文件在同一位置
+   ADD jdk-8u171-linux-x64.tar.gz /usr/local/java/
+   # 配置java环境变量
+   ENV JAVA_HOME /usr/local/java/jdk1.8.0_171
+   ENV JRE_HOME $JAVA_HOME/jre
+   ENV CLASSPATH $JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar:$JRE_HOME/lib:$CLASSPATH
+   ENV PATH $JAVA_HOME/bin:$PATH
+
+   EXPOSE 80
+   
+   CMD echo $MYPATH
+   CMD echo "success---------->ok!"
+   CMD /bin/bash
+
+
+   ```
+
+3. 构建镜像
+   ```text
+   docker build -t 新镜像名称:TAG . 
+   
+   注意，上面TAG后面有个空格，有个点
+   ```
+
+
 
